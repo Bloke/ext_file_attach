@@ -54,18 +54,10 @@ $plugin['flags'] = '0';
 // #@language ISO-LANGUAGE-CODE
 // abc_string_name => Localized String
 
-/** Uncomment me, if you need a textpack
-$plugin['textpack'] = <<< EOT
-#@admin
-#@language en-gb
-abc_sample_string => Sample String
-abc_one_more => One more
-#@language de-de
-abc_sample_string => Beispieltext
-abc_one_more => Noch einer
+$plugin['textpack'] = <<<EOT
+#@public
+zcr_file_invalid_type => Field &#8220;<strong>{field}</strong>&#8221; is not of the expected type.
 EOT;
-**/
-// End of textpack
 
 if (!defined('txpinterface'))
         @include_once('zem_tpl.php');
@@ -360,7 +352,6 @@ Somewhere in your @<txp:zem_contact>@ form, add the tag @<txp:zem_contact_file>@
 Note that only one file is permitted for upload. Suggest customers zip files up if sending multiples.
 
 Upon submission, the plugin tries to catch as many error conditions as possible, but different browsers react in different ways to size/MIME type violations, so there may be instances in which the form just 'fails' silently without reporting why. Also, some (most?) recipient email systems annoyingly apply spam filtering and heuristics that will silently drop any messages they feel are dangerous or spammy. So a successful send is no guarantee of successful reception of the message and its attached payload.
-
 # --- END PLUGIN HELP ---
 -->
 <?php
