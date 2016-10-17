@@ -342,6 +342,12 @@ h1. zcr_file_attach
 
 Adds the ability to upload a file with the zem_contact_reborn plugin.
 
+h2. Pre-requisites
+
+* Textpattern v4.5.x or higher.
+* zem_contact_reborn plugin v4.5.0.0+ installed and enabled.
+* jQuery loaded on the public page containing the contact form.
+
 h2. Usage
 
 Somewhere in your @<txp:zem_contact>@ form, add the tag @<txp:zem_contact_file>@ tag. It accepts all the usual HTML5 attributes for regular input elements (see zem_contact_reborn's documentation). Attributes that are specific to this tag:
