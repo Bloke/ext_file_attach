@@ -264,6 +264,7 @@ function com_connect_file($atts)
 
     // HTML5 attributes
     $required = ($required) ? 'required' : '';
+
     if ($doctype !== 'xhtml') {
         $attr += com_connect_build_atts(array(
             'form'         => $html_form,
@@ -290,7 +291,9 @@ function com_connect_file($atts)
         '<input' . $classStr . ($attr ? ' ' . implode(' ', $attr) : '') . ' />' .
         ($label_position === 'after' ? $break . $labelStr : '') .
         script_js(<<<EOJS
-jQuery('#{$html_form}').attr('enctype', 'multipart/form-data');
+jQuery(function() {
+    jQuery('#{$html_form}').attr('enctype', 'multipart/form-data');
+});
 EOJS
 );
 }
