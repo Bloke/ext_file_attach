@@ -56,7 +56,7 @@ $plugin['flags'] = '0';
 
 $plugin['textpack'] = <<<EOT
 #@public
-ext_file_invalid_type => Field &#8220;<strong>{field}</strong>&#8221; is not of the expected type.
+ext_file_invalid_type => Field <strong>{field}</strong> is not of the expected type.
 EOT;
 
 if (!defined('txpinterface'))
