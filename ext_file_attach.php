@@ -19,7 +19,7 @@ $plugin['name'] = 'ext_file_attach';
 
 $plugin['version'] = '1.0.0';
 $plugin['author'] = 'Stef Dawson';
-$plugin['author_uri'] = 'http://stefdawson.com/';
+$plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Add file upload ability to com_connect';
 
 // Plugin load order:
