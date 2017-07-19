@@ -17,7 +17,7 @@ $plugin['name'] = 'ext_file_attach';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '1.0.0';
+$plugin['version'] = '1.0.1';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Add file upload ability to com_connect';
@@ -75,7 +75,7 @@ if (txpinterface === 'public') {
 
 /**
  * Callback hook for com_connect to handle attaching the file.
- * 
+ *
  * @param  string $evt     Textpattern event
  * @param  string $stp     Textpattern step (action)
  * @param  array  $payload Delivery content, passed in from com_connect
@@ -133,7 +133,7 @@ function ext_file_attach($evt, $stp, &$payload)
                 $file_attached = true;
             }
 
-            // Todo: delete temp file or does PHP do it?
+            // TODO: delete temp file or does PHP do it?
             break;
         }
     }
@@ -246,7 +246,7 @@ function com_connect_file($atts)
         }
     }
 
-    // Core attributes
+    // Core attributes.
     $attr = com_connect_build_atts(array(
         'accept' => $accept,
         'id'     => (isset($id) ? $id : $name),
@@ -262,7 +262,7 @@ function com_connect_file($atts)
         $attr['maxlength'] = 'maxlength="' . intval($max) . '"';
     }
 
-    // HTML5 attributes
+    // HTML5 attributes.
     $required = ($required) ? 'required' : '';
 
     if ($doctype !== 'xhtml') {
@@ -273,7 +273,7 @@ function com_connect_file($atts)
         ));
     }
 
-    // Global attributes
+    // Global attributes.
     $attr += com_connect_build_atts($com_connect_globals, $atts);
 
     $classes = array();
@@ -315,7 +315,7 @@ function ext_file_max()
             $max_size = $upload_max;
         }
 
-        // If Txp's file_max_upload_size is less, then reduce. Except if
+        // If Textpattern's file_max_upload_size is less, then reduce. Except if
         // zero, which indicates no limit.
         $upload_max = get_pref('file_max_upload_size');
 
@@ -349,12 +349,12 @@ if (0) {
 # --- BEGIN PLUGIN HELP ---
 h1. ext_file_attach
 
-Adds the ability to upload a file with the com_connect plugin.
+Textpattern CMS plugin module for "com_connect plugin":https://github.com/textpattern/com_connect to allow simple file uploading as an attachment to the contact email.
 
 h2. Pre-requisites
 
-* Textpattern v4.5.x or higher.
-* com_connect plugin v4.5.0.0+ installed and enabled.
+* Textpattern CMS v4.5.x or higher.
+* com_connect plugin v4.6.0 or higher installed and enabled.
 * jQuery loaded on the public page containing the contact form.
 
 h2. Usage
@@ -362,9 +362,9 @@ h2. Usage
 Somewhere in your @<txp:com_connect>@ form, add the tag @<txp:com_connect_file>@ tag. It accepts all the usual HTML5 attributes for regular input elements (see com_connect's documentation). Attributes that are specific to this tag:
 
 * @accept="comma-separated values"@ List of acceptable file extensions (including the leading dot), or valid MIME types. Note that this is not particularly robust and can be fooled by merely changing the file extension of the file being uploaded. Omitted = all files.
-* @max="value"@ The maximum file size permitted. If omitted, uses whichever is smaller of the _Maximum file size of uploads_ pref or php.ini's @upload_max_filesize@ / @post_max_size@.
+* @max="value"@ The maximum file size permitted. If omitted, uses whichever is smaller of the 'Maximum file size of uploads' preference or @php.ini@'s @upload_max_filesize@ / @post_max_size@ configuration.
 
-Note that only one file is permitted for upload. Suggest customers zip files up if sending multiples.
+Note that only one file is permitted for upload. Suggest customers Zip files up if sending multiples.
 
 Upon submission, the plugin tries to catch as many error conditions as possible, but different browsers react in different ways to size/MIME type violations, so there may be instances in which the form just 'fails' silently without reporting why. Also, some (most?) recipient email systems annoyingly apply spam filtering and heuristics that will silently drop any messages they feel are dangerous or spammy. So a successful send is no guarantee of successful reception of the message and its attached payload.
 # --- END PLUGIN HELP ---
