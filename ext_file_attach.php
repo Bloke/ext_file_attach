@@ -17,7 +17,7 @@ $plugin['name'] = 'ext_file_attach';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.10';
+$plugin['version'] = '1.0.0';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'http://stefdawson.com/';
 $plugin['description'] = 'Add file upload ability to com_connect';
