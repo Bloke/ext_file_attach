@@ -1,7 +1,7 @@
 {
   "name": "bloke/ext_file_attach",
   "description": "Add file upload ability to com_connnect plugin for Textpattern CMS",
-  "keywords": ["textpattern", "plugin", "images", "src-set"],
+  "keywords": ["textpattern", "plugin", "files", "uploading", "uploads", "sending", "attachments"],
   "homepage": "https://github.com/bloke/ext_file_attach",
   "license": "GPL-2.0",
   "type": "textpattern-plugin",
