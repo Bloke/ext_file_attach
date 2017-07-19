@@ -1,0 +1,20 @@
+h1. ext_file_attach
+
+Textpattern CMS plugin module for "com_connect plugin":https://github.com/textpattern/com_connect to allow simple file uploading as an attachment to the contact email.
+
+h2. Pre-requisites
+
+* Textpattern CMS v4.5.x or higher.
+* com_connect plugin v4.6.0 or higher installed and enabled.
+* jQuery loaded on the public page containing the contact form.
+
+h2. Usage
+
+Somewhere in your @<txp:com_connect>@ form, add the tag @<txp:com_connect_file>@ tag. It accepts all the usual HTML5 attributes for regular input elements (see com_connect's documentation). Attributes that are specific to this tag:
+
+* @accept="comma-separated values"@ List of acceptable file extensions (including the leading dot), or valid MIME types. Note that this is not particularly robust and can be fooled by merely changing the file extension of the file being uploaded. Omitted = all files.
+* @max="value"@ The maximum file size permitted. If omitted, uses whichever is smaller of the 'Maximum file size of uploads' preference or @php.ini@'s @upload_max_filesize@ / @post_max_size@ configuration.
+
+Note that only one file is permitted for upload. Suggest customers Zip files up if sending multiples.
+
+Upon submission, the plugin tries to catch as many error conditions as possible, but different browsers react in different ways to size/MIME type violations, so there may be instances in which the form just 'fails' silently without reporting why. Also, some (most?) recipient email systems annoyingly apply spam filtering and heuristics that will silently drop any messages they feel are dangerous or spammy. So a successful send is no guarantee of successful reception of the message and its attached payload.
