@@ -10,7 +10,7 @@
 // file name. Plugin names should start with a three letter prefix which is
 // unique and reserved for each plugin author ("abc" is just an example).
 // Uncomment and edit this line to override:
-$plugin['name'] = 'zcr_file_attach';
+$plugin['name'] = 'ext_file_attach';
 
 // Allow raw HTML help, as opposed to Textile.
 // 0 = Plugin help is in Textile format, no raw HTML allowed (default).
@@ -20,7 +20,7 @@ $plugin['name'] = 'zcr_file_attach';
 $plugin['version'] = '0.10';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'http://stefdawson.com/';
-$plugin['description'] = 'Add file upload ability to zem_contact_reborn';
+$plugin['description'] = 'Add file upload ability to com_connect';
 
 // Plugin load order:
 // The default value of 5 would fit most plugins, while for instance comment
@@ -56,7 +56,7 @@ $plugin['flags'] = '0';
 
 $plugin['textpack'] = <<<EOT
 #@public
-zcr_file_invalid_type => Field &#8220;<strong>{field}</strong>&#8221; is not of the expected type.
+ext_file_invalid_type => Field &#8220;<strong>{field}</strong>&#8221; is not of the expected type.
 EOT;
 
 if (!defined('txpinterface'))
@@ -64,26 +64,30 @@ if (!defined('txpinterface'))
 
 # --- BEGIN PLUGIN CODE ---
 if (txpinterface === 'public') {
-    register_callback('zcr_file_attach', 'zemcontact.deliver');
+    register_callback('ext_file_attach', 'comconnect.deliver');
 
     // Register tags if necessary.
     if (class_exists('\Textpattern\Tag\Registry')) {
         Txp::get('\Textpattern\Tag\Registry')
-            ->register('zem_contact_file');
+            ->register('com_connect_file');
     }
 }
 
 /**
- * Callback hook for zem_contact_reborn to handle attaching the file.
+ * Callback hook for com_connect to handle attaching the file.
+ * 
+ * @param  string $evt     Textpattern event
+ * @param  string $stp     Textpattern step (action)
+ * @param  array  $payload Delivery content, passed in from com_connect
  */
-function zcr_file_attach($evt, $stp, &$payload)
+function ext_file_attach($evt, $stp, &$payload)
 {
-    global $zem_contact_error;
+    global $com_connect_error;
 
     $file_attached = false;
 
     foreach ($payload['fields'] as $key => $value) {
-        if (strpos($key, 'zcr_file_') === 0) {
+        if (strpos($key, 'ext_file_') === 0) {
             $file_size = $value['size'];
             $file_type = $value['type'];
             $file_name = $value['name'];
@@ -95,26 +99,26 @@ function zcr_file_attach($evt, $stp, &$payload)
             // Check for errors.
             // This is rarely triggered unfortunately because most browsers validate file sizes and types,
             // throwing empty arrays or just silently failing on our behalf. Grrr.
-            // Not only that, ZCR doesn't know what to do with any error strings at the moment so it'd just
+            // Not only that, com_connect doesn't know what to do with any error strings at the moment so it'd just
             // report a generic 'sorry' message.
             if ($file_error > 0) {
                 switch ($file_error) {
                     case 1:
                     case 2:
-                        $max = zcr_file_max();
-                        $zem_contact_error[] = gTxt('zem_contact_maxval_warning', array('{field}' => $hlabel, '{value}' => $max));
-                        $out = 'zemcontact.fail';
+                        $max = ext_file_max();
+                        $com_connect_error[] = gTxt('com_connect_maxval_warning', array('{field}' => $hlabel, '{value}' => $max));
+                        $out = 'comconnect.fail';
                         break;
                     case 3:
                         // File only partially uploaded.
-                        $out = 'zemcontact.fail';
+                        $out = 'comconnect.fail';
                         break;
                     case 4:
                         // No file uploaded: no worries, ignore it. Field is probably not required.
                         break;
                     case 6:
                         // Missing temporary folder.
-                        $out = 'zemcontact.fail';
+                        $out = 'comconnect.fail';
                         break;
                 }
 
@@ -158,7 +162,7 @@ function zcr_file_attach($evt, $stp, &$payload)
             . '--' . $fileBoundary . '--';
     }
 
-    // Back to ZCR to mail out the modified content
+    // Back to com_connect to mail out the modified content
     return;
 }
 
@@ -168,34 +172,34 @@ function zcr_file_attach($evt, $stp, &$payload)
  * @param  array  $atts Tag attributes
  * @return string HTML
  */
-function zem_contact_file($atts)
+function com_connect_file($atts)
 {
-    global $zem_contact_error, $zem_contact_submit, $zem_contact_flags;
+    global $com_connect_error, $com_connect_submit, $com_connect_flags;
 
-    $max_upload_size = zcr_file_max();
+    $max_upload_size = ext_file_max();
 
-    extract(zem_contact_lAtts(array(
+    extract(com_connect_lAtts(array(
         'accept'         => '',
         'break'          => br,
-        'class'          => 'zemFile',
-        'html_form'      => $zem_contact_flags['this_form'],
+        'class'          => 'comFile',
+        'html_form'      => $com_connect_flags['this_form'],
         'isError'        => '',
-        'label'          => gTxt('zem_contact_file'),
+        'label'          => gTxt('com_connect_file'),
         'label_position' => 'before',
         'max'            => $max_upload_size,
         'min'            => 0,
         'placeholder'    => '',
-        'required'       => $zem_contact_flags['required'],
+        'required'       => $com_connect_flags['required'],
         'type'           => 'file',
     ), $atts));
 
     $doctype = get_pref('doctype', 'xhtml');
 
     if (empty($name)) {
-        $name = zem_contact_label2name($label);
+        $name = com_connect_label2name($label);
     }
 
-    if ($zem_contact_submit) {
+    if ($com_connect_submit) {
         $hlabel = txpspecialchars($label);
 
         if (array_key_exists($name, $_FILES)) {
@@ -203,7 +207,7 @@ function zem_contact_file($atts)
             $acceptableTypes = do_list($accept);
 
             if ($fileInfo['size'] && ($fileInfo['size'] > $max)) {
-                $zem_contact_error[] = gTxt('zem_contact_maxval_warning', array('{field}' => $hlabel, '{value}' => $max));
+                $com_connect_error[] = gTxt('com_connect_maxval_warning', array('{field}' => $hlabel, '{value}' => $max));
                 $isError = "errorElement";
             } elseif ($accept && $fileInfo['name'] !== '') {
                 $isOK = false;
@@ -225,25 +229,25 @@ function zem_contact_file($atts)
                 }
 
                 if ($isOK) {
-                    zem_contact_store('zcr_file_' . $name, $label, $fileInfo);
+                    com_connect_store('ext_file_' . $name, $label, $fileInfo);
                 } else {
-                    $zem_contact_error[] = gTxt('zcr_file_invalid_type', array('{field}' => $hlabel));
+                    $com_connect_error[] = gTxt('ext_file_invalid_type', array('{field}' => $hlabel));
                     $isError = "errorElement";
                 }
             } else {
-                zem_contact_store('zcr_file_' . $name, $label, $fileInfo);
+                com_connect_store('ext_file_' . $name, $label, $fileInfo);
             }
         } elseif ($required && empty($_FILES)) {
-            $zem_contact_error[] = gTxt('zem_contact_maxval_warning', array('{field}' => $hlabel, '{value}' => $max));
+            $com_connect_error[] = gTxt('com_connect_maxval_warning', array('{field}' => $hlabel, '{value}' => $max));
             $isError = "errorElement";
         } elseif ($required) {
-            $zem_contact_error[] = gTxt('zem_contact_field_missing', array('{field}' => $hlabel));
+            $com_connect_error[] = gTxt('com_connect_field_missing', array('{field}' => $hlabel));
             $isError = "errorElement";
         }
     }
 
     // Core attributes
-    $attr = zem_contact_build_atts(array(
+    $attr = com_connect_build_atts(array(
         'accept' => $accept,
         'id'     => (isset($id) ? $id : $name),
         'name'   => $name,
@@ -261,7 +265,7 @@ function zem_contact_file($atts)
     // HTML5 attributes
     $required = ($required) ? 'required' : '';
     if ($doctype !== 'xhtml') {
-        $attr += zem_contact_build_atts(array(
+        $attr += com_connect_build_atts(array(
             'form'         => $html_form,
             'placeholder'  => $placeholder,
             'required'     => $required,
@@ -269,11 +273,11 @@ function zem_contact_file($atts)
     }
 
     // Global attributes
-    $attr += zem_contact_build_atts($zem_contact_globals, $atts);
+    $attr += com_connect_build_atts($com_connect_globals, $atts);
 
     $classes = array();
 
-    foreach (array($class, ($required ? 'zemRequired' : ''), $isError) as $cls) {
+    foreach (array($class, ($required ? 'comRequired' : ''), $isError) as $cls) {
         if ($cls) {
             $classes[] = $cls;
         }
@@ -292,17 +296,18 @@ EOJS
 }
 
 // Returns a file size limit in bytes.
-function zcr_file_max()
+function ext_file_max()
 {
     $max_size = -1;
 
     if ($max_size < 0) {
         // Start with post_max_size.
-        $max_size = zcr_file_parse_size(ini_get('post_max_size'));
+        $max_size = ext_file_parse_size(ini_get('post_max_size'));
 
         // If upload_max_size is less, then reduce. Except if
         // zero, which indicates no limit.
-        $upload_max = zcr_file_parse_size(ini_get('upload_max_filesize'));
+        $upload_max = ext_file_parse_size(ini_get('upload_max_filesize'));
+
         if ($upload_max > 0 && $upload_max < $max_size) {
             $max_size = $upload_max;
         }
@@ -310,6 +315,7 @@ function zcr_file_max()
         // If Txp's file_max_upload_size is less, then reduce. Except if
         // zero, which indicates no limit.
         $upload_max = get_pref('file_max_upload_size');
+
         if ($upload_max > 0 && $upload_max < $max_size) {
             $max_size = $upload_max;
         }
@@ -321,7 +327,7 @@ function zcr_file_max()
 /**
  * Convert a size value with suffix (K, M, G, T, etc) to bytes.
  */
-function zcr_file_parse_size($size)
+function ext_file_parse_size($size)
 {
     $unit = preg_replace('/[^bkmgtpezy]/i', '', $size); // Remove the non-unit characters from the size.
     $size = preg_replace('/[^0-9\.]/', '', $size); // Remove the non-numeric characters from the size.
@@ -338,19 +344,19 @@ if (0) {
 ?>
 <!--
 # --- BEGIN PLUGIN HELP ---
-h1. zcr_file_attach
+h1. ext_file_attach
 
-Adds the ability to upload a file with the zem_contact_reborn plugin.
+Adds the ability to upload a file with the com_connect plugin.
 
 h2. Pre-requisites
 
 * Textpattern v4.5.x or higher.
-* zem_contact_reborn plugin v4.5.0.0+ installed and enabled.
+* com_connect plugin v4.5.0.0+ installed and enabled.
 * jQuery loaded on the public page containing the contact form.
 
 h2. Usage
 
-Somewhere in your @<txp:zem_contact>@ form, add the tag @<txp:zem_contact_file>@ tag. It accepts all the usual HTML5 attributes for regular input elements (see zem_contact_reborn's documentation). Attributes that are specific to this tag:
+Somewhere in your @<txp:com_connect>@ form, add the tag @<txp:com_connect_file>@ tag. It accepts all the usual HTML5 attributes for regular input elements (see com_connect's documentation). Attributes that are specific to this tag:
 
 * @accept="comma-separated values"@ List of acceptable file extensions (including the leading dot), or valid MIME types. Note that this is not particularly robust and can be fooled by merely changing the file extension of the file being uploaded. Omitted = all files.
 * @max="value"@ The maximum file size permitted. If omitted, uses whichever is smaller of the _Maximum file size of uploads_ pref or php.ini's @upload_max_filesize@ / @post_max_size@.
