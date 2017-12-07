@@ -141,23 +141,22 @@ function ext_file_attach($evt, $stp, &$payload)
     if ($file_attached) {
         $fileBoundary = md5('boundary1');
         $textBoundary = md5('boundary2');
-        $sep = (is_windows() ? "\r\n" : "\n");
+        $sep = PHP_EOL;
 
         $payload['headers']['MIME-Version'] = '1.0';
-        $payload['headers']['content_type'] = 'multipart/mixed; boundary=' . $fileBoundary . $sep . $sep
-            . '--' . $fileBoundary . $sep
-            . 'Content-Type: multipart/alternative; boundary=' . $textBoundary . $sep . $sep
+        $payload['headers']['content_type'] = 'multipart/mixed; boundary=' . $fileBoundary;
+        $payload['body'] = '--' . $fileBoundary . $sep
+            . 'Content-Type: multipart/alternative; boundary=' . $textBoundary . $sep
             . '--' . $textBoundary . $sep
-            . 'Content-Type: text/plain; charset=utf-8' . $sep . $sep
-            . $payload['body'] . $sep . $sep
-            . '--' . $textBoundary . '--' . $sep
+            . 'Content-Type: text/plain; charset=utf-8' . $sep
+            . $payload['body'] . $sep
             . '--' . $fileBoundary . $sep
             . 'Content-Type:' . $file_type . '; '
                 . 'name="' . $file_name . '"' . $sep
             . 'Content-Transfer-Encoding:base64' . $sep
-                . 'Content-Disposition:attachment; '
+            . 'Content-Disposition:attachment; '
                 . 'filename="' . $file_name . '"' . $sep
-            . 'X-Attachment-Id:' . rand(1000, 9000) . $sep . $sep
+            . 'X-Attachment-Id:' . rand(1000, 9000) . $sep
             . $encoded_content . $sep
             . '--' . $fileBoundary . '--';
     }
@@ -333,10 +332,11 @@ function ext_file_max()
 function ext_file_parse_size($size)
 {
     $unit = preg_replace('/[^bkmgtpezy]/i', '', $size); // Remove the non-unit characters from the size.
-    $size = preg_replace('/[^0-9\.]/', '', $size); // Remove the non-numeric characters from the size.
+    $size = preg_replace('/[^0-9\.\,]/', '', $size); // Remove the non-numeric characters from the size.
 
    if ($unit) {
-        // Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
+        // Find the position of the unit in the ordered string which is
+        // the power of magnitude to multiply a kilobyte by.
         return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
     } else {
         return round($size);
