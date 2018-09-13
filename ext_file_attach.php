@@ -17,7 +17,7 @@ $plugin['name'] = 'ext_file_attach';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '1.0.1';
+$plugin['version'] = '1.0.2';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Add file upload ability to com_connect';
@@ -150,13 +150,14 @@ function ext_file_attach($evt, $stp, &$payload)
             . '--' . $textBoundary . $sep
             . 'Content-Type: text/plain; charset=utf-8' . $sep
             . $payload['body'] . $sep
+            . '--' . $textBoundary . '--' . $sep
             . '--' . $fileBoundary . $sep
             . 'Content-Type:' . $file_type . '; '
                 . 'name="' . $file_name . '"' . $sep
             . 'Content-Transfer-Encoding:base64' . $sep
             . 'Content-Disposition:attachment; '
                 . 'filename="' . $file_name . '"' . $sep
-            . 'X-Attachment-Id:' . rand(1000, 9000) . $sep
+            . 'X-Attachment-Id:' . rand(1000, 9000) . $sep . $sep
             . $encoded_content . $sep
             . '--' . $fileBoundary . '--';
     }
