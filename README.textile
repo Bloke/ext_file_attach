@@ -4,9 +4,8 @@ Textpattern CMS plugin module for "com_connect plugin":https://github.com/textpa
 
 h2. Pre-requisites
 
-* Textpattern CMS v4.5.x or higher.
+* Textpattern CMS v4.6.x or higher.
 * com_connect plugin v4.6.0 or higher installed and enabled.
-* jQuery loaded on the public page containing the contact form.
 
 h2. Usage
 
