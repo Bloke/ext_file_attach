@@ -291,8 +291,19 @@ function com_connect_file($atts)
         '<input' . $classStr . ($attr ? ' ' . implode(' ', $attr) : '') . ' />' .
         ($label_position === 'after' ? $break . $labelStr : '') .
         script_js(<<<EOJS
-jQuery(function() {
-    jQuery('#{$html_form}').attr('enctype', 'multipart/form-data');
+function com_ext_attach_handler() {
+    var b = document.getElementById('{$html_form}');
+    b.setAttribute("enctype", "multipart/form-data");
+}
+
+if (document.readyState != 'loading') {
+    com_ext_attach_handler();
+} else if (document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', com_ext_attach_handler);
+} else document.attachEvent('onreadystatechange', function() {
+    if (document.readyState=='interactive') {
+        com_ext_attach_handler()();
+    }
 });
 EOJS
 );
