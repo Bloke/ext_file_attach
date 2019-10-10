@@ -1,3 +1,12 @@
+# Changelog
+
+## 1.0.3 - 2019-10-10
+
+* Attempt to catch submission errors when the server empties out POST data for unknown reasons.
+* Add an extra separator before text/plain content to help some mail programs display the first line of the message properly.
+* Fix use of an unset variable.
+* Remove a redundant line of code.
+
 ## 1.0.2 - 2018-09-13
 
 * Fix empty (0-byte) files received by some email clients.
