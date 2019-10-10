@@ -17,7 +17,7 @@ $plugin['name'] = 'ext_file_attach';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '1.0.2';
+$plugin['version'] = '1.0.3';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Add file upload ability to com_connect';
@@ -93,7 +93,6 @@ function ext_file_attach($evt, $stp, &$payload)
             $file_name = $value['name'];
             $file_temp = $value['tmp_name'];
             $file_error = $value['error'];
-            $field = current($value);
             $out = '';
 
             // Check for errors.
@@ -106,7 +105,7 @@ function ext_file_attach($evt, $stp, &$payload)
                     case 1:
                     case 2:
                         $max = ext_file_max();
-                        $com_connect_error[] = gTxt('com_connect_maxval_warning', array('{field}' => $hlabel, '{value}' => $max));
+                        $com_connect_error[] = gTxt('com_connect_maxval_warning', array('{field}' => gTxt('upload_file'), '{value}' => $max));
                         $out = 'comconnect.fail';
                         break;
                     case 3:
@@ -148,7 +147,7 @@ function ext_file_attach($evt, $stp, &$payload)
         $payload['body'] = '--' . $fileBoundary . $sep
             . 'Content-Type: multipart/alternative; boundary=' . $textBoundary . $sep
             . '--' . $textBoundary . $sep
-            . 'Content-Type: text/plain; charset=utf-8' . $sep
+            . 'Content-Type: text/plain; charset=utf-8' . $sep . $sep
             . $payload['body'] . $sep
             . '--' . $textBoundary . '--' . $sep
             . '--' . $fileBoundary . $sep
@@ -197,6 +196,11 @@ function com_connect_file($atts)
 
     if (empty($name)) {
         $name = com_connect_label2name($label);
+    }
+
+    if (empty($_FILES) && empty($_POST) && isset($_SERVER['REQUEST_METHOD']) && strtolower($_SERVER['REQUEST_METHOD']) === 'post') {
+        // Pretend it submitted okay, to render errors.
+        $com_connect_submit = 1;
     }
 
     if ($com_connect_submit) {
