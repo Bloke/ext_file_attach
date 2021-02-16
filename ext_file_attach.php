@@ -366,7 +366,7 @@ if (0) {
 # --- BEGIN PLUGIN HELP ---
 h1. ext_file_attach
 
-Textpattern CMS plugin module for "com_connect plugin":https://github.com/textpattern/com_connect to allow simple file uploading as an attachment to the contact email.
+Textpattern CMS plugin module for the "com_connect plugin":https://plugins.textpattern.com/plugins/com_connect to allow simple file uploading as an attachment to the contact email.
 
 h2. Pre-requisites
 

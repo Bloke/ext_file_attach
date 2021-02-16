@@ -1,6 +1,6 @@
 h1. ext_file_attach
 
-Textpattern CMS plugin module for "com_connect plugin":https://github.com/textpattern/com_connect to allow simple file uploading as an attachment to the contact email.
+Textpattern CMS plugin module for the "com_connect plugin":https://plugins.textpattern.com/plugins/com_connect to allow simple file uploading as an attachment to the contact email.
 
 h2. Pre-requisites
 
@@ -9,11 +9,25 @@ h2. Pre-requisites
 
 h2. Usage
 
-Somewhere in your @<txp:com_connect>@ form, add the tag @<txp:com_connect_file>@ tag. It accepts all the usual HTML5 attributes for regular input elements (see com_connect's documentation). Attributes that are specific to this tag:
+Somewhere in your @<txp:com_connect>@ form/container, add the @<txp:com_connect_file />@ tag. It accepts all the usual HTML5 attributes for regular input elements (see com_connect's documentation). Attributes that are specific to this tag:
 
 * @accept="comma-separated values"@ List of acceptable file extensions (including the leading dot), or valid MIME types. Note that this is not particularly robust and can be fooled by merely changing the file extension of the file being uploaded. Omitted = all files.
-* @max="value"@ The maximum file size permitted. If omitted, uses whichever is smaller of the 'Maximum file size of uploads' preference or @php.ini@'s @upload_max_filesize@ / @post_max_size@ configuration.
+* @max="value"@ The maximum file size permitted. You can specify this value in bytes, or with units, e.g. 600k is 600 Kilobytes, 2m is 2 Megabytes, and so on. If omitted, uses whichever is smaller of the 'Maximum file size of uploads' preference or @php.ini@'s @upload_max_filesize@ / @post_max_size@ configuration. Note that if you specify a value greater than the ones in the PHP or Textpattern configs, your value will be ignored and the smallest system-imposed limit will be used instead. You can use any one of these suffixes when specifying the max value:
+** b (bytes)
+** k (kilobytes)
+** m (megabytes)
+** g (gigabytes)
+** t (terabytes)
+** p (petabytes)
+** e (exabytes)
+** z (zetabytes)
+** y (yotabytes)
 
-Note that only one file is permitted for upload. Suggest customers Zip files up if sending multiples.
+Note that only one file is currently permitted for upload. Suggest customers Zip files up if sending multiples.
 
 Upon submission, the plugin tries to catch as many error conditions as possible, but different browsers react in different ways to size/MIME type violations, so there may be instances in which the form just 'fails' silently without reporting why. Also, some (most?) recipient email systems annoyingly apply spam filtering and heuristics that will silently drop any messages they feel are dangerous or spammy. So a successful send is no guarantee of successful reception of the message and its attached payload.
+
+h2. Notes
+
+* The plugin tries to detect file size violations _before_ going through the rigmarole of uploading it by using a cheat built into PHP. The success of this is system/browser dependent.
+* If you try to submit a file that exceeds the limit and it is not caught by the browser before the upload begins, you will be notified of this fact by the server afterwards. But at that point, as far as com_connect is concerned, the form is tainted and has been "used". Thus if you try to simply select another file and resubmit, you will be told the form has already been submitted. There is sadly no workaround for this at present.

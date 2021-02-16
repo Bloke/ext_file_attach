@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.4 - 2021-02-16
+
+* Permit file sizes to be specified using shorthand (10m, 60k, 2g, etc).
+* Add hidden MAX_FILE_SIZE input field in the vain hope that some PHP systems will detect size violations prior to upload.
+* Report correct maximum size in force on server-side errors.
+* Remove bogus minlength/maxlength attributes to fix validation (thanks, colak).
+
 ## 1.0.3 - 2019-10-10
 
 * Attempt to catch submission errors when the server empties out POST data for unknown reasons.
