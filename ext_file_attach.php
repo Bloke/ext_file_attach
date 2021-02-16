@@ -17,7 +17,7 @@ $plugin['name'] = 'ext_file_attach';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '1.0.3';
+$plugin['version'] = '1.0.4';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Add file upload ability to com_connect';
@@ -105,6 +105,8 @@ function ext_file_attach($evt, $stp, &$payload)
                     case 1:
                     case 2:
                         $max = ext_file_max();
+                        $userMax = !empty($payload['fields']['MAX_FILE_SIZE']) ? $payload['fields']['MAX_FILE_SIZE'] : $max;
+                        $max = min($userMax, $max);
                         $com_connect_error[] = gTxt('com_connect_maxval_warning', array('{field}' => gTxt('upload_file'), '{value}' => $max));
                         $out = 'comconnect.fail';
                         break;
@@ -186,13 +188,15 @@ function com_connect_file($atts)
         'label'          => gTxt('com_connect_file'),
         'label_position' => 'before',
         'max'            => $max_upload_size,
-        'min'            => 0,
         'placeholder'    => '',
         'required'       => $com_connect_flags['required'],
         'type'           => 'file',
     ), $atts));
 
     $doctype = get_pref('doctype', 'xhtml');
+
+    // Convert to bytes if not already
+    $max = ext_file_parse_size($max);
 
     if (empty($name)) {
         $name = com_connect_label2name($label);
@@ -210,7 +214,7 @@ function com_connect_file($atts)
             $fileInfo = $_FILES[$name];
             $acceptableTypes = do_list($accept);
 
-            if ($fileInfo['size'] && ($fileInfo['size'] > $max)) {
+            if (!empty($fileInfo['size']) && ($fileInfo['size'] > $max)) {
                 $com_connect_error[] = gTxt('com_connect_maxval_warning', array('{field}' => $hlabel, '{value}' => $max));
                 $isError = "errorElement";
             } elseif ($accept && $fileInfo['name'] !== '') {
@@ -250,6 +254,10 @@ function com_connect_file($atts)
         }
     }
 
+    // PHP max file size helper. Not infallible but useful.
+    $maxhidden = ($max) ? parse('<com::connect_text type="hidden" name="MAX_FILE_SIZE" class="comHidden" min="" max="" default="'.$max.'" />') : '';
+    unset($atts['max']);
+
     // Core attributes.
     $attr = com_connect_build_atts(array(
         'accept' => $accept,
@@ -257,14 +265,6 @@ function com_connect_file($atts)
         'name'   => $name,
         'type'   => $type,
     ));
-
-    if ($min) {
-        $attr['minlength'] = 'minlength="' . intval($min) . '"';
-    }
-
-    if ($max) {
-        $attr['maxlength'] = 'maxlength="' . intval($max) . '"';
-    }
 
     // HTML5 attributes.
     $required = ($required) ? 'required' : '';
@@ -292,6 +292,7 @@ function com_connect_file($atts)
     $labelStr = '<label for="' . $name . '"' . $classStr . '>' . txpspecialchars($label) . '</label>';
 
     return ($label_position === 'before' ? $labelStr . $break : '') .
+        $maxhidden.
         '<input' . $classStr . ($attr ? ' ' . implode(' ', $attr) : '') . ' />' .
         ($label_position === 'after' ? $break . $labelStr : '') .
         script_js(<<<EOJS
@@ -374,14 +375,29 @@ h2. Pre-requisites
 
 h2. Usage
 
-Somewhere in your @<txp:com_connect>@ form, add the tag @<txp:com_connect_file>@ tag. It accepts all the usual HTML5 attributes for regular input elements (see com_connect's documentation). Attributes that are specific to this tag:
+Somewhere in your @<txp:com_connect>@ form/container, add the @<txp:com_connect_file />@ tag. It accepts all the usual HTML5 attributes for regular input elements (see com_connect's documentation). Attributes that are specific to this tag:
 
 * @accept="comma-separated values"@ List of acceptable file extensions (including the leading dot), or valid MIME types. Note that this is not particularly robust and can be fooled by merely changing the file extension of the file being uploaded. Omitted = all files.
-* @max="value"@ The maximum file size permitted. If omitted, uses whichever is smaller of the 'Maximum file size of uploads' preference or @php.ini@'s @upload_max_filesize@ / @post_max_size@ configuration.
+* @max="value"@ The maximum file size permitted. You can specify this value in bytes, or with units, e.g. 600k is 600 Kilobytes, 2m is 2 Megabytes, and so on. If omitted, uses whichever is smaller of the 'Maximum file size of uploads' preference or @php.ini@'s @upload_max_filesize@ / @post_max_size@ configuration. Note that if you specify a value greater than the ones in the PHP or Textpattern configs, your value will be ignored and the smallest system-imposed limit will be used instead. You can use any one of these suffixes when specifying the max value:
+** b (bytes)
+** k (kilobytes)
+** m (megabytes)
+** g (gigabytes)
+** t (terabytes)
+** p (petabytes)
+** e (exabytes)
+** z (zetabytes)
+** y (yotabytes)
 
-Note that only one file is permitted for upload. Suggest customers Zip files up if sending multiples.
+Note that only one file is currently permitted for upload. Suggest customers Zip files up if sending multiples.
 
 Upon submission, the plugin tries to catch as many error conditions as possible, but different browsers react in different ways to size/MIME type violations, so there may be instances in which the form just 'fails' silently without reporting why. Also, some (most?) recipient email systems annoyingly apply spam filtering and heuristics that will silently drop any messages they feel are dangerous or spammy. So a successful send is no guarantee of successful reception of the message and its attached payload.
+
+h2. Notes
+
+* The plugin tries to detect file size violations _before_ going through the rigmarole of uploading it by using a cheat built into PHP. The success of this is system/browser dependent.
+* If you try to submit a file that exceeds the limit and it is not caught by the browser before the upload begins, you will be notified of this fact by the server afterwards. But at that point, as far as com_connect is concerned, the form is tainted and has been "used". Thus if you try to simply select another file and resubmit, you will be told the form has already been submitted. There is sadly no workaround for this at present.
+
 # --- END PLUGIN HELP ---
 -->
 <?php
