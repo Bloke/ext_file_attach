@@ -17,7 +17,7 @@ $plugin['name'] = 'ext_file_attach';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '1.0.4';
+$plugin['version'] = '1.0.5';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Add file upload ability to com_connect';
@@ -255,7 +255,7 @@ function com_connect_file($atts)
     }
 
     // PHP max file size helper. Not infallible but useful.
-    $maxhidden = ($max) ? parse('<com::connect_text type="hidden" name="MAX_FILE_SIZE" class="comHidden" min="" max="" default="'.$max.'" />') : '';
+    $maxhidden = ($max) ? parse('<com::connect_text type="hidden" name="MAX_FILE_SIZE" class="comHidden" min="" max="" default="'.$max.'" required="0" label="" />') : '';
     unset($atts['max']);
 
     // Core attributes.

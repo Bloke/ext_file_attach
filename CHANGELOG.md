@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5 - 2021-02-17
+
+* Fix validation errors on hidden input field (thanks, colak).
+
 ## 1.0.4 - 2021-02-16
 
 * Permit file sizes to be specified using shorthand (10m, 60k, 2g, etc).

@@ -1,7 +1,7 @@
 {
   "name": "ext_file_attach",
   "description": "Add file upload ability to com_connnect",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": 5,
   "author": "Stef Dawson",
   "author_uri": "https://stefdawson.com/",
